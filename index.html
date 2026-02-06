@@ -607,17 +607,14 @@
                             <span class="tech-tag">Dart</span>
                             <span class="tech-tag">Local Storage</span>
                         </div>
-                        <!-- Download Button Added Here -->
-                        <div class="project-download-btn">
-                            <button class="download-btn" onclick="downloadFlutterProject()">
-                                <i class="fas fa-download"></i> Download Project Files
-                            </button>
+                    
+
                             <div style="margin-top: auto; padding-top: 1.5rem;">
-                            <button class="btn btn-small" onclick="viewProject('project2')" style="width: 100%;">
+                            <a href="/pages/notepaddetail.html"><button class="btn btn-small"style="width: 100%;">
                                 <i class="fas fa-external-link-alt"></i> View Project Details
-                            </button>
+                            </button></a>
                         </div>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -628,16 +625,16 @@
                     </div>
                     <div class="project-info">
                         <h3>Real-time Communication System</h3>
-                        <p>A messaging application built with Firebase database for real-time communication between users.</p>
+                        <p>A Flutter-based real-time communication app featuring AI chatbot (Urdu responses), public group chat, message editing/deletion Firebase</p>
                         <div class="project-tech">
                             <span class="tech-tag">Firebase</span>
                             <span class="tech-tag">Real-time DB</span>
                             <span class="tech-tag">Flutter</span>
                         </div>
                         <div style="margin-top: auto; padding-top: 1.5rem;">
-                            <button class="btn btn-small" onclick="viewProject('project2')" style="width: 100%;">
+                          <a href="/pages/ChatApp.html">  <button class="btn btn-small" onclick="viewProject('project2')" style="width: 100%;">
                                 <i class="fas fa-external-link-alt"></i> View Project Details
-                            </button>
+                            </button></a>
                         </div>
                     </div>
                 </div>
@@ -898,87 +895,7 @@
             }
         });
 
-        // Function to download Flutter Text Editor project
-        function downloadFlutterProject() {
-            // IMPORTANT: Replace this URL with your actual project download link
-            // This could be a GitHub download link, Google Drive link, Dropbox link, etc.
-            const downloadUrl = 'https://github.com/Nikhil-Waswani/Nikhil_Portfolio/raw/main/app-release.apk';
-            
-            // Create a temporary anchor element to trigger download
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = 'flutter-text-editor-project.zip'; // Name of the downloaded file
-            link.target = '_blank'; // Open in new tab for external links
-            
-            // Append to body, click, and remove
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Show download confirmation message
-            showDownloadNotification();
-        }
 
-        // Function to show download notification
-        function showDownloadNotification() {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background-color: #28a745;
-                color: white;
-                padding: 15px 20px;
-                border-radius: 5px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 9999;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                animation: slideIn 0.3s ease;
-            `;
-            
-            notification.innerHTML = `
-                <i class="fas fa-check-circle"></i>
-                <div>
-                    <strong>Download Started!</strong>
-                    <div style="font-size: 0.9em; opacity: 0.9;">Flutter Text Editor project is downloading...</div>
-                </div>
-            `;
-            
-            // Add to body
-            document.body.appendChild(notification);
-            
-            // Remove after 4 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 4000);
-            
-            // Add CSS animations
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-
-        // Function for other project buttons
-        function viewProject(projectId) {
-            // This is a placeholder function for other project buttons
-            // You can customize this to show project details in a modal or redirect to a page
-            alert(`This would show more details about ${projectId}. You can implement a modal or separate page for this.`);
-        }
     </script>
 </body>
 </html>
