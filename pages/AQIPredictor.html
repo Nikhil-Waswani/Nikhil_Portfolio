@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Day AQI Forecaster - ML Pipeline | Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2D9CDB;
+            --primary-dark: #1e7bb9;
+            --secondary: #56CCF2;
+            --accent: #F2C94C;
+            --dark-bg: #0F0F1E;
+            --dark-card: #1A1A2E;
+            --dark-card-hover: #22223E;
+            --text-primary: #F0F0F0;
+            --text-secondary: #B0B0C0;
+            --sky-blue: #56CCF2;
+            --leaf-green: #6FCF97;
+            --border: #2A2A3E;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--dark-bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(45, 156, 219, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(111, 207, 151, 0.05) 0%, transparent 20%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(15, 15, 30, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+        }
+
+        .back-btn {
+            background-color: var(--dark-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        main {
+            padding: 40px 0 80px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .project-icon {
+            font-size: 4rem;
+            color: var(--sky-blue);
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--sky-blue), var(--leaf-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .summary {
+            background-color: rgba(45, 156, 219, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 30px auto 0;
+            border-left: 4px solid var(--sky-blue);
+        }
+
+        .tech-tags {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .tech-tag {
+            background-color: var(--dark-card);
+            color: var(--sky-blue);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-tag:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Content Cards */
+        .content-card {
+            background-color: var(--dark-card);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            color: var(--sky-blue);
+            margin-right: 15px;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(45, 156, 219, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .card-content p {
+            margin-bottom: 15px;
+        }
+
+        /* Architecture Flow */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .flow-step {
+            background-color: var(--dark-card-hover);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            min-width: 140px;
+        }
+
+        .flow-step i {
+            display: block;
+            font-size: 1.4rem;
+            color: var(--sky-blue);
+            margin-bottom: 8px;
+        }
+
+        .flow-arrow {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-item:hover {
+            background-color: rgba(45, 156, 219, 0.1);
+            border-color: var(--sky-blue);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 1.8rem;
+            color: var(--leaf-green);
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            flex-grow: 1;
+        }
+
+        /* Tech Stack Section */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .tech-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tech-item:hover {
+            background-color: rgba(45, 156, 219, 0.1);
+            border-color: var(--sky-blue);
+            transform: translateY(-5px);
+        }
+
+        .tech-logo {
+            font-size: 3rem;
+            color: var(--sky-blue);
+            margin-bottom: 15px;
+        }
+
+        .tech-name {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* Model Comparison Table */
+        .model-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            font-size: 0.95rem;
+        }
+
+        .model-table th, .model-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .model-table th {
+            color: var(--sky-blue);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .model-table tr.winner td {
+            color: var(--leaf-green);
+            font-weight: 600;
+        }
+
+        .model-table td:first-child {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Screenshots / Charts Section */
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .screenshot-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .screenshot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: var(--sky-blue);
+        }
+
+        .screenshot-img {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(135deg, #1a2a3a, #2a3a4a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screenshot-caption {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-primary);
+            font-weight: 500;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Contribution Section */
+        .contribution-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 25px;
+        }
+
+        .role-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .role-title {
+            color: var(--leaf-green);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .responsibility-list {
+            list-style-type: none;
+        }
+
+        .responsibility-list li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .responsibility-list li:before {
+            content: "✓";
+            color: var(--leaf-green);
+            position: absolute;
+            left: 0;
+        }
+
+        /* Challenges Section */
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .challenge-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .challenge-title {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Links Section */
+        .links-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .github-btn {
+            background-color: var(--dark-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .github-btn:hover {
+            background-color: #333;
+            transform: translateY(-3px);
+        }
+
+        .contact-btn {
+            background: linear-gradient(90deg, var(--sky-blue), var(--primary-dark));
+            color: white;
+            border: none;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(45, 156, 219, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .content-card {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+            
+            .card-title {
+                font-size: 1.6rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .screenshots-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-container {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .model-table {
+                font-size: 0.85rem;
+            }
+            
+            .links-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .link-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .content-card {
+                padding: 25px 20px;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .screenshot-img {
+                height: 180px;
+            }
+            
+            .contribution-container, .challenges-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .model-table th, .model-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-code logo-icon"></i> Nikhil Portfolio
+            </a>
+            <a href="/index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Portfolio
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="project-icon">
+                    <i class="fas fa-cloud-sun"></i>
+                </div>
+                <h1>3-Day AQI Forecaster</h1>
+                <p class="tagline">A serverless, fully automated machine learning system that forecasts Air Quality Index 3 days in advance</p>
+                
+                <div class="summary">
+                    <p>An end-to-end ML pipeline for Khairpur, Pakistan that ingests live weather and pollutant data every hour, retrains three competing models daily, and serves a 3-day AQI forecast through a live Streamlit dashboard — with zero servers to manage.</p>
+                </div>
+                
+                <div class="tech-tags">
+                    <span class="tech-tag">
+                        <i class="fab fa-python"></i> Python
+                    </span>
+                    <span class="tech-tag">
+                        <i class="fas fa-brain"></i> Scikit-learn
+                    </span>
+                    <span class="tech-tag">
+                        <i class="fas fa-bolt"></i> XGBoost
+                    </span>
+                    <span class="tech-tag">
+                        <i class="fas fa-fire"></i> Firebase
+                    </span>
+                    <span class="tech-tag">
+                        <i class="fas fa-chart-line"></i> Streamlit
+                    </span>
+                    <span class="tech-tag">
+                        <i class="fab fa-github"></i> GitHub Actions
+                    </span>
+                </div>
+            </section>
+
+            <!-- About Project -->
+            <section class="content-card" style="animation-delay: 0.1s">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h2 class="card-title">About the Project</h2>
+                </div>
+                <div class="card-content">
+                    <p><strong>Problem it solves:</strong> Air quality in many cities changes quickly and unpredictably, but most residents only have access to the current AQI reading, not where it's heading. Knowing the trend a few days ahead helps people plan outdoor activity and manage health risks.</p>
+                    
+                    <p><strong>Why it was built:</strong> I wanted to build a complete, production-style ML system rather than a one-off notebook — one that collects its own data, retrains itself, and stays live without me touching a server. It became a hands-on study in MLOps fundamentals: automated pipelines, feature stores, and continuous model evaluation.</p>
+                    
+                    <p><strong>Project Goal:</strong> Predict the Air Quality Index for Khairpur, PK for the next 3 days using live OpenWeather data, automatically picking the best-performing model out of three candidates every single day.</p>
+                </div>
+            </section>
+
+            <!-- Architecture -->
+            <section class="content-card" style="animation-delay: 0.15s">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <h2 class="card-title">System Architecture</h2>
+                </div>
+                <div class="card-content">
+                    <p>Everything runs on free-tier infrastructure, orchestrated entirely by scheduled GitHub Actions — no always-on server required:</p>
+
+                    <div class="flow-container">
+                        <div class="flow-step">
+                            <i class="fas fa-satellite-dish"></i>
+                            OpenWeather API
+                        </div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-step">
+                            <i class="fas fa-clock"></i>
+                            Hourly Pipeline
+                        </div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-step">
+                            <i class="fas fa-database"></i>
+                            Firestore Feature Store
+                        </div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-step">
+                            <i class="fas fa-robot"></i>
+                            Daily Retraining
+                        </div>
+                        <i class="fas fa-arrow-right flow-arrow"></i>
+                        <div class="flow-step">
+                            <i class="fas fa-chart-area"></i>
+                            Streamlit Dashboard
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tech Stack -->
+            <section class="content-card" style="animation-delay: 0.2s">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h2 class="card-title">Technology Stack</h2>
+                </div>
+                <div class="card-content">
+                    <p>Each layer of the pipeline was chosen to stay free, simple, and fully automatable:</p>
+                    
+                    <div class="tech-grid">
+                        <div class="tech-item">
+                            <div class="tech-logo">
+                                <i class="fab fa-python"></i>
+                            </div>
+                            <h3 class="tech-name">Python</h3>
+                            <p class="feature-desc">Core language for the data pipeline, feature engineering, and model training scripts.</p>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-logo">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <h3 class="tech-name">Firebase Firestore</h3>
+                            <p class="feature-desc">Serverless NoSQL feature store holding both live hourly readings and a year of backfilled historical data.</p>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-logo">
+                                <i class="fas fa-chart-area"></i>
+                            </div>
+                            <h3 class="tech-name">Streamlit</h3>
+                            <p class="feature-desc">Live web dashboard showing current conditions, the 3-day forecast, and model performance metrics.</p>
+                        </div>
+
+                        <div class="tech-item">
+                            <div class="tech-logo">
+                                <i class="fab fa-github"></i>
+                            </div>
+                            <h3 class="tech-name">GitHub Actions</h3>
+                            <p class="feature-desc">Scheduled CI/CD jobs that run the hourly ingestion and daily retraining — the entire "infrastructure" for this project.</p>
+                        </div>
+
+                        <div class="tech-item">
+                            <div class="tech-logo">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3 class="tech-name">Scikit-learn & XGBoost</h3>
+                            <p class="feature-desc">Ridge Regression, Random Forest, and XGBoost trained daily, compared by RMSE, with the best one promoted automatically.</p>
+                        </div>
+
+                        <div class="tech-item">
+                            <div class="tech-logo">
+                                <i class="fas fa-magnifying-glass-chart"></i>
+                            </div>
+                            <h3 class="tech-name">SHAP</h3>
+                            <p class="feature-desc">Model interpretability layer used to confirm and explain which features actually drive the AQI prediction.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section class="content-card" style="animation-delay: 0.3s">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h2 class="card-title">Key Features</h2>
+                </div>
+                <div class="card-content">
+                    <p>A complete, self-sustaining ML system rather than a static prediction script:</p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h3 class="feature-title">Hourly Data Collection</h3>
+                            <p class="feature-desc">Automatically pulls live air pollution and weather data from OpenWeather every hour and writes it to Firestore.</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <h3 class="feature-title">Daily Auto-Retraining</h3>
+                            <p class="feature-desc">Retrains 3 candidate models every day on the latest combined dataset and promotes the lowest-RMSE model automatically.</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <h3 class="feature-title">3-Day AQI Forecast</h3>
+                            <p class="feature-desc">Projects pollutant trends forward to estimate AQI for the next 3 days, displayed with category labels (Good → Hazardous).</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3 class="feature-title">Live Dashboard</h3>
+                            <p class="feature-desc">Streamlit app showing current conditions, the 3-day outlook, a 24-hour AQI trend chart, and live model metrics.</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h3 class="feature-title">Feature Store Pattern</h3>
+                            <p class="feature-desc">Separates live hourly data from a year of historical backfilled data in Firestore, mirroring real-world ML feature store design.</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-magnifying-glass-chart"></i>
+                            </div>
+                            <h3 class="feature-title">Explainable Predictions</h3>
+                            <p class="feature-desc">SHAP analysis confirms PM2.5 as the dominant driver of AQI, validating the model against the actual EPA formula.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Model Comparison -->
+            <section class="content-card" style="animation-delay: 0.4s">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-table"></i>
+                    </div>
+                    <h2 class="card-title">Model Performance</h2>
+                </div>
+                <div class="card-content">
+                    <p>Three models are trained and compared automatically every day; the best one (lowest RMSE) is promoted to production:</p>
+
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>RMSE</th>
+                                <th>MAE</th>
+                                <th>R²</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-circle" style="font-size:0.5rem;"></i> Ridge Regression</td>
+                                <td>21.22</td>
+                                <td>12.40</td>
+                                <td>0.877</td>
+                            </tr>
+                            <tr class="winner">
+                                <td><i class="fas fa-trophy"></i> Random Forest</td>
+                                <td>2.28</td>
+                                <td>0.10</td>
+                                <td>0.999</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-circle" style="font-size:0.5rem;"></i> XGBoost</td>
+                                <td>6.25</td>
+                                <td>0.80</td>
+                                <td>0.989</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 25px; background-color: rgba(111, 207, 151, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid var(--leaf-green);">
+                        <h3 style="color: var(--leaf-green); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-magnifying-glass-chart"></i>
+                            SHAP Feature Importance
+                        </h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 0;">PM2.5 concentration is by far the strongest predictor, which lines up with the US EPA AQI formula being derived directly from PM2.5 — a good sanity check that the model is learning the right relationship rather than a spurious one.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pipeline Stages / "Screenshots" -->
+            <section class="content-card" style="animation-delay: 0.5s">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-diagram-project"></i>
+                    </div>
+                    <h2 class="card-title">Pipeline Stages</h2>
+                </div>
+                <div class="card-content">
+                    <p>Four scripts, each with a single responsibility, chained together by scheduled automation:</p>
+                    
+                    <div class="screenshots-grid">
+                        <div class="screenshot-card">
+                            <div class="screenshot-img">
+                                <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px;">
+                                    <i class="fas fa-satellite-dish" style="font-size: 2.5rem; color: var(--sky-blue);"></i>
+                                    <span>feature_pipeline.py</span>
+                                </div>
+                            </div>
+                            <div class="screenshot-caption">Hourly ingestion → EPA AQI calculation → Firestore</div>
+                        </div>
+                        
+                        <div class="screenshot-card">
+                            <div class="screenshot-img">
+                                <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px;">
+                                    <i class="fas fa-robot" style="font-size: 2.5rem; color: var(--leaf-green);"></i>
+                                    <span>train_model.py</span>
+                                </div>
+                            </div>
+                            <div class="screenshot-caption">Trains Ridge, Random Forest & XGBoost daily</div>
+                        </div>
+                        
+                        <div class="screenshot-card">
+                            <div class="screenshot-img">
+                                <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px;">
+                                    <i class="fas fa-magnifying-glass-chart" style="font-size: 2.5rem; color: var(--accent);"></i>
+                                    <span>shap_analysis.py</span>
+                                </div>
+                            </div>
+                            <div class="screenshot-caption">Explains predictions with feature importance</div>
+                        </div>
+
+                        <div class="screenshot-card">
+                            <div class="screenshot-img">
+                                <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px;">
+                                    <i class="fas fa-chart-area" style="font-size: 2.5rem; color: var(--sky-blue);"></i>
+                                    <span>dashboard.py</span>
+                                </div>
+                            </div>
+                            <div class="screenshot-caption">Live Streamlit forecast & monitoring UI</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Developer Contribution -->
+            <section class="content-card" style="animation-delay: 0.6s">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h2 class="card-title">My Contribution</h2>
+                </div>
+                <div class="card-content">
+                    <p>This was a solo, end-to-end build covering the full ML lifecycle, not just the modeling step:</p>
+                    
+                    <div class="contribution-container">
+                        <div class="role-card">
+                            <h3 class="role-title">
+                                <i class="fas fa-laptop-code"></i>
+                                Role: Full ML Pipeline Development
+                            </h3>
+                            <ul class="responsibility-list">
+                                <li>Designed the end-to-end architecture</li>
+                                <li>Built the data ingestion & feature engineering layer</li>
+                                <li>Set up Firebase as a feature store</li>
+                                <li>Automated training & deployment with GitHub Actions</li>
+                                <li>Built and deployed the Streamlit dashboard</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="role-card">
+                            <h3 class="role-title">
+                                <i class="fas fa-tasks"></i>
+                                Key Responsibilities
+                            </h3>
+                            <ul class="responsibility-list">
+                                <li>Implemented the US EPA AQI breakpoint formula</li>
+                                <li>Backfilled and uploaded 1 year of historical data</li>
+                                <li>Trained and benchmarked 3 regression models</li>
+                                <li>Ran EDA (8 charts) and SHAP analysis (3 charts)</li>
+                                <li>Wrote CI/CD workflows for hourly + daily automation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Challenges & Learnings -->
+            <section class="content-card" style="animation-delay: 0.7s">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h2 class="card-title">Challenges & Learning</h2>
+                </div>
+                <div class="card-content">
+                    <div class="challenges-grid">
+                        <div class="challenge-card">
+                            <h3 class="challenge-title">
+                                <i class="fas fa-server"></i>
+                                Staying Fully Serverless
+                            </h3>
+                            <p>Designing every stage — ingestion, training, and serving — to run on free-tier GitHub Actions and Firebase, with no server I had to manage or pay for, took careful scheduling and state design.</p>
+                        </div>
+                        
+                        <div class="challenge-card">
+                            <h3 class="challenge-title">
+                                <i class="fas fa-database"></i>
+                                Feature Store Design
+                            </h3>
+                            <p>Splitting live and historical data into separate Firestore collections, then merging and deduplicating them at training time, mirrors how production feature stores actually work.</p>
+                        </div>
+                        
+                        <div class="challenge-card">
+                            <h3 class="challenge-title">
+                                <i class="fas fa-chart-line"></i>
+                                Forecasting Without a Forecast API
+                            </h3>
+                            <p>The free OpenWeather tier only gives current conditions, not future weather — so the 3-day outlook is generated by projecting pollutant trends forward rather than a true multi-step forecast.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; background-color: rgba(111, 207, 151, 0.1); border-radius: 12px; padding: 20px; border-left: 4px solid var(--leaf-green);">
+                        <h3 style="color: var(--leaf-green); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-graduation-cap"></i>
+                            Key Learnings
+                        </h3>
+                        <ul style="color: var(--text-secondary); padding-left: 20px;">
+                            <li style="margin-bottom: 8px;">Hands-on experience with MLOps fundamentals: CI/CD for ML, automated retraining, model promotion</li>
+                            <li style="margin-bottom: 8px;">Practical use of Firebase Firestore as a lightweight feature store</li>
+                            <li style="margin-bottom: 8px;">Comparing regression models rigorously using RMSE/MAE/R² rather than picking one by default</li>
+                            <li style="margin-bottom: 8px;">Using SHAP to validate that a model has learned a sensible, explainable relationship</li>
+                            <li>Recognizing the gap between a "live dashboard" and a true time-series forecast — and being upfront about that distinction</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Call to Action -->
+            <section class="content-card" style="animation-delay: 0.8s; text-align: center;">
+                <div class="card-header" style="justify-content: center;">
+                    <div class="card-icon">
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+                    <h2 class="card-title">Project Links</h2>
+                </div>
+                <div class="card-content">
+                    <p style="margin-bottom: 30px;">Check out the live forecast or the source code:</p>
+                    
+                    <div class="links-container">
+                        <a href="https://github.com/Nikhil-Waswani/3days_Weather_pridictor" target="_blank" class="link-btn github-btn">
+                            <i class="fab fa-github"></i> View GitHub Repository
+                        </a>
+                        
+                        <a href="https://3daysweatherpridictor.streamlit.app/" target="_blank" class="link-btn contact-btn">
+                            <i class="fas fa-chart-area"></i> Live Dashboard
+                        </a>
+                    </div>
+                    
+                    <div style="margin-top: 30px; color: var(--text-secondary);">
+                        <p><i class="fas fa-info-circle"></i> This project demonstrates end-to-end ML system design — data pipelines, automated retraining, and deployment — beyond just model building.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>3-Day AQI Forecaster &copy; 2025 | Serverless ML Pipeline for Air Quality Prediction</p>
+            <p>Built with Python, Scikit-learn, Firebase & Streamlit — automated end-to-end with GitHub Actions</p>
+        </div>
+    </footer>
+
+    <script>
+        // Add hover animation to cards on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add staggered animation to feature items
+            const featureItems = document.querySelectorAll('.feature-item');
+            featureItems.forEach((item, index) => {
+                item.style.animationDelay = `${0.1 * index}s`;
+                item.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                item.style.opacity = '0';
+            });
+            
+            // Add staggered animation to tech items
+            const techItems = document.querySelectorAll('.tech-item');
+            techItems.forEach((item, index) => {
+                item.style.animationDelay = `${0.1 * index}s`;
+                item.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                item.style.opacity = '0';
+            });
+            
+            // Add staggered animation to screenshot cards
+            const screenshotCards = document.querySelectorAll('.screenshot-card');
+            screenshotCards.forEach((item, index) => {
+                item.style.animationDelay = `${0.15 * index}s`;
+                item.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                item.style.opacity = '0';
+            });
+            
+            // Smooth back button (falls back to history if no referrer)
+            document.querySelector('.back-btn').addEventListener('click', function(e) {
+                if (document.referrer && document.referrer.includes(window.location.host)) {
+                    e.preventDefault();
+                    window.history.back();
+                }
+            });
+            
+            // Add subtle parallax effect on scroll
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const hero = document.querySelector('.hero');
+                hero.style.transform = `translateY(${scrolled * 0.05}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
